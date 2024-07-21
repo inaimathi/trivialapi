@@ -29,7 +29,7 @@ def headers(accessToken):
         auth = f"Bearer {accessToken}"
 
     hdrs["Authorization"] = auth
-    return headers
+    return hdrs
 
 
 def apiGet(path, accessToken):

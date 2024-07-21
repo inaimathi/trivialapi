@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytoda"
+version = "0.0.1"
+authors = [
+  { name="inaimathi", email="leo.zovic@gmail.com" },
+]
+description = "A trivial set of bindnigs to the TODA payment API"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = ["requests"]
+
+[project.urls]
+Homepage = "https://github.com/inaimathi/pytoda"
+Issues = "https://github.com/inaimathi/pytoda/issues"

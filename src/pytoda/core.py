@@ -13,7 +13,7 @@ class TODA:
         client = [s for s in secrets if "client_id" in s and "client_secret" in s][0]
         self.client_id = client["client_id"]
         self.client_secret = client["client_secret"]
-        self.token = token.get(self.client_id, self.client_secret)[0]
+        self.token = token.get(self.client_id, self.client_secret)[0]["access_token"]
 
     @classmethod
     def from_dict(cls, dct):
