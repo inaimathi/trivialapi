@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "trivialapi"
-version = "0.0.5"
+version = "0.0.6"
 authors = [
   { name="inaimathi", email="leo.zovic@gmail.com" },
 ]
@@ -16,7 +16,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = ["requests"]
+dependencies = ["requests", "pyyaml"]
 
 [project.urls]
 Homepage = "https://github.com/inaimathi/trivialapi"
