@@ -3,12 +3,12 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pytoda"
-version = "0.0.1"
+name = "trivialapi"
+version = "0.0.3"
 authors = [
   { name="inaimathi", email="leo.zovic@gmail.com" },
 ]
-description = "A trivial set of bindnigs to the TODA payment API"
+description = "A trivial set of API bindings for things I use. So far, TODA and FleetDM"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -19,5 +19,5 @@ classifiers = [
 dependencies = ["requests"]
 
 [project.urls]
-Homepage = "https://github.com/inaimathi/pytoda"
-Issues = "https://github.com/inaimathi/pytoda/issues"
+Homepage = "https://github.com/inaimathi/trivialapi"
+Issues = "https://github.com/inaimathi/trivialapi/issues"

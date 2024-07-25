@@ -1,6 +1,6 @@
 import unittest
 
-from src.pytoda import core
+from src.trivialapi.toda import core
 
 
 class TestBasics(unittest.TestCase):
