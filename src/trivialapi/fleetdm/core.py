@@ -120,3 +120,32 @@ class FleetDM:
         elif host["platform_like"] == "debian":
             query = "SELECT 1 FROM disk_encryption WHERE encrypted=1 AND name LIKE '/dev/dm-1';"
         return self.host_livequery(host, query)
+
+    def enroll_secret(self):
+        return self.get("fleet/spec/enroll_secret").json()["spec"]["secrets"][0][
+            "secret"
+        ]
+
+    def build_commands(self):
+        url = self.url
+        secret = self.get_enroll_secret()
+        return [
+            f"fleetctl package --type={tp} --enable-scripts --fleet-desktop --fleet-url{url} --enroll-secret={secret}"
+            for tp in ["pkg", "msi", "deb", "rpm"]
+        ]
+
+    def add_user(self, email, password):
+        return self.post(
+            "fleet/users/admin",
+            data={
+                "email": email,
+                "name": email.split("@")[0],
+                "password": password,
+                "api_only": True,
+                "global_role": "admin",
+                "admin_forced_password_reset": False,
+            },
+        ).json()
+
+    def users(self):
+        return self.get("fleet/users").json()["users"]
