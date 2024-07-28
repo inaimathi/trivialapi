@@ -76,3 +76,6 @@ class Twin:
 
     def balance(self):
         return util.apiGet(f"https://{self.hostname}/dq?apiKey={self.key}", None)[0]
+
+    def binder(self):
+        return util.apiGet(f"https://{self.hostname}/binder?apiKey={self.key}", None)[0]
