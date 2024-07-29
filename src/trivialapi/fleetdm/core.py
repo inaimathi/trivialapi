@@ -147,5 +147,46 @@ class FleetDM:
             },
         ).json()
 
+    def add_initial_user(self, email, password, org_name, fleet_url=None):
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            with p.firefox.launch() as browser:
+                try:
+                    page = browser.new_page()
+                    page.goto(self.url)
+                    print("Filling out user...")
+                    page.query_selector("#name").fill(email.split("@")[0])
+                    page.query_selector("#email").fill(email)
+                    page.query_selector("#password").fill(password)
+                    page.query_selector("#password_confirmation").fill(password)
+                    page.query_selector('button[type="submit"]').click()
+
+                    print("Filling out org...")
+                    page.query_selector("#org_name").fill(org_name)
+                    page.query_selector('button[type="submit"]').click()
+
+                    if fleet_url is not None:
+                        print(f"Using specified URL {fleet_url}...")
+                        page.query_selector("#server_url").fill(fleet_url)
+                    else:
+                        print("Accepting default URL...")
+                    page.query_selector('button[type="submit"]').click()
+
+                    print("Confirming...")
+                    page.query_selector('button[type="submit"]').click()
+
+                    return True
+                except Exception as e:
+                    print(f"FAILED {e}")
+                    return False
+
+    def add_initial_user(self, email, password):
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            with p.firefox.launch() as browser:
+                page = browser.new_page()
+
     def users(self):
         return self.get("fleet/users").json()["users"]
