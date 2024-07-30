@@ -130,7 +130,7 @@ class FleetDM:
         url = self.url
         secret = self.enroll_secret()
         return [
-            f"fleetctl package --type={tp} --enable-scripts --fleet-desktop --fleet-url{url} --enroll-secret={secret}"
+            f"fleetctl package --type={tp} --enable-scripts --fleet-desktop --fleet-url={url} --enroll-secret={secret}"
             for tp in ["pkg", "msi", "deb", "rpm"]
         ]
 
