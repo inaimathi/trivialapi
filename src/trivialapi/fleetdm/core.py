@@ -181,12 +181,5 @@ class FleetDM:
                     print(f"FAILED {e}")
                     return False
 
-    def add_initial_user(self, email, password):
-        from playwright.sync_api import sync_playwright
-
-        with sync_playwright() as p:
-            with p.firefox.launch() as browser:
-                page = browser.new_page()
-
     def users(self):
         return self.get("fleet/users").json()["users"]
