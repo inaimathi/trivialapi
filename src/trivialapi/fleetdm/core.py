@@ -126,9 +126,13 @@ class FleetDM:
             "secret"
         ]
 
-    def build_commands(self):
+    def team_secrets(self, team_id):
+        return self.get(f"fleet/teams/{team_id}/secrets").json()["secrets"]
+
+    def build_commands(self, secret=None):
         url = self.url
-        secret = self.enroll_secret()
+        if secret is None:
+            secret = self.enroll_secret()
         return [
             f"fleetctl package --type={tp} --enable-scripts --fleet-desktop --fleet-url={url} --enroll-secret={secret}"
             for tp in ["pkg", "msi", "deb", "rpm"]
