@@ -109,7 +109,7 @@ class FleetDM:
 
     def create_team(self, team_name):
         assert team_name, "team_name is required"
-        return self.post("fleet/teams", data={"name": team_name})
+        return self.post("fleet/teams", data={"name": team_name}).json()["team"]["id"]
 
     def team_secrets(self, team_id):
         return self.get(f"fleet/teams/{team_id}/secrets").json()["secrets"]
