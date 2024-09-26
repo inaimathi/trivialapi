@@ -105,7 +105,7 @@ class FleetDM:
         return self.get(f"fleet/queries/{query['id']}/report").json()["results"]
 
     def teams(self):
-        return self.get("fleet/teams")
+        return self.get("fleet/teams").json()["teams"]
 
     def create_team(self, team_name):
         assert team_name, "team_name is required"
