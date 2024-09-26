@@ -104,6 +104,16 @@ class FleetDM:
     def query_report(self, query):
         return self.get(f"fleet/queries/{query['id']}/report").json()["results"]
 
+    def teams(self):
+        return self.get("fleet/teams")
+
+    def create_team(self, team_name):
+        assert team_name, "team_name is required"
+        return self.post("fleet/teams", data={"name": team_name})
+
+    def team_secrets(self, team_id):
+        return self.get(f"fleet/teams/{team_id}/secrets").json()["secrets"]
+
     def hosts(self, team_id=None):
         if team_id is None:
             return self.get("fleet/hosts").json()["hosts"]
@@ -127,9 +137,6 @@ class FleetDM:
         return self.get("fleet/spec/enroll_secret").json()["spec"]["secrets"][0][
             "secret"
         ]
-
-    def team_secrets(self, team_id):
-        return self.get(f"fleet/teams/{team_id}/secrets").json()["secrets"]
 
     def build_commands(self, secret=None):
         url = self.url
