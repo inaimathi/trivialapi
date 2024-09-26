@@ -104,8 +104,10 @@ class FleetDM:
     def query_report(self, query):
         return self.get(f"fleet/queries/{query['id']}/report").json()["results"]
 
-    def hosts(self):
-        return self.get("fleet/hosts").json()["hosts"]
+    def hosts(self, team_id=None):
+        if team_id is None:
+            return self.get("fleet/hosts").json()["hosts"]
+        return self.get(f"fleet/hosts?team_id={team_id}").json()["hosts"]
 
     def host_livequery(self, host, query_string):
         return self.post(
