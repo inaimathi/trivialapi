@@ -73,6 +73,28 @@ class FleetDM:
 
         raise Exception(resp.status_code, resp.content)
 
+    def _raw_delete(self, endpoint, data, version):
+        return requests.delete(
+            f"{self.url}/api/{version}/{endpoint}",
+            headers=self._headers(),
+            json=data,
+            verify=self.verify,
+        )
+
+    def delete(self, endpoint, data=None, version="v1"):
+        resp = self._raw_delete(endpoint, data, version)
+        if resp.status_code == 401 and self.email:
+            self.relogin()
+            resp = self._raw_post(endpoint, data, version)
+
+        if resp.status_code == 401:
+            raise PermissionError()
+
+        if 200 <= resp.status_code <= 299:
+            return resp
+
+        raise Exception(resp.status_code, resp.content)
+
     def standard_query_library(self):
         resp = requests.get(
             "https://raw.githubusercontent.com/fleetdm/fleet/main/docs/01-Using-Fleet/standard-query-library/standard-query-library.yml"
@@ -118,6 +140,15 @@ class FleetDM:
         if team_id is None:
             return self.get("fleet/hosts").json()["hosts"]
         return self.get(f"fleet/hosts?team_id={team_id}").json()["hosts"]
+
+    def transfer_hosts(self, host_ids, new_team_id):
+        return self.post(
+            "fleet/hosts/transfer",
+            data={"team_id": new_team_id, "hosts": host_ids},
+        )
+
+    def delete_team(self, team_id):
+        return self.delete(f"fleet/teams/{team_id}").json()
 
     def host_livequery(self, host, query_string):
         return self.post(
