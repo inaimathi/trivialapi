@@ -1,9 +1,21 @@
 import logging
 
 import requests
-from src.trivialapi import util
 
-logger = util.getLogger("trivialapi::unified", level=logging.DEBUG)
+
+def getLogger(name, level=logging.DEBUG):
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+    return logger
+
+
+logger = getLogger("trivialapi::unified", level=logging.DEBUG)
 
 
 def _request(token):
