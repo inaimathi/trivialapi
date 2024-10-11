@@ -67,6 +67,18 @@ def _paginated(req):
     return pgreq
 
 
+class Connection:
+    def __init__(self, req, connection_id):
+        self.req = req
+        self.connection_id = connection_id
+
+    def info(self):
+        return self.req(f"unified/connection/{self.connection_id}")
+
+    def delete(self):
+        return self.req(f"unified/connection/{self.connection_id}", method="DELETE")
+
+
 class Messaging:
     def __init__(self, req, connection_id):
         self.req = req
@@ -158,6 +170,9 @@ class Unified:
     def __init__(self, token):
         self.token = token
         self.req = _request(token)
+
+    def connection(self, connection_id):
+        return Connection(self.req, connection_id)
 
     def messaging(self, connection_id):
         return Messaging(self.req, connection_id)
