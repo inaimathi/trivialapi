@@ -227,3 +227,8 @@ class FleetDM:
 
     def users(self):
         return self.get("fleet/users").json()["users"]
+    
+    def update_hosts_user(self, host, email):
+        return self.put(f"fleet/hosts/{host['id']}/device_mapping", data={
+                "email": email,
+            },).json()
