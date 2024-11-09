@@ -72,6 +72,28 @@ class FleetDM:
             return resp
 
         raise Exception(resp.status_code, resp.content)
+    
+    def _raw_put(self, endpoint, data, version):
+        return requests.put(
+            f"{self.url}/api/{version}/{endpoint}",
+            headers=self._headers(),
+            json=data,
+            verify=self.verify,
+        )
+    
+    def put(self, endpoint, data=None, version="v1"):
+        resp = self._raw_put(endpoint, data, version)
+        if resp.status_code == 401 and self.email:
+            self.relogin()
+            resp = self._raw_put(endpoint, data, version)
+
+        if resp.status_code == 401:
+            raise PermissionError()
+
+        if 200 <= resp.status_code <= 299:
+            return resp
+
+        raise Exception(resp.status_code, resp.content)
 
     def _raw_delete(self, endpoint, data, version):
         return requests.delete(
