@@ -30,92 +30,48 @@ class FleetDM:
         if self.token is not None:
             return {"Authorization": f"Bearer {self.token}"}
 
-    def _raw_get(self, endpoint, version):
-        return requests.get(
-            f"{self.url}/api/{version}/{endpoint}",
-            headers=self._headers(),
-            verify=self.verify,
-        )
+    def _raw_req(self, method, endpoint, data=None, version="v1"):
+        url = f"{self.url}/api/{version}/{endpoint}"
+        headers = self._headers()
+        response = requests.request(method, url, headers=headers, json=data, verify=self.verify)
+        return response
+
+    def _request_with_relogin(self, method, endpoint, data=None, version="v1"):
+        resp = self._raw_req(method, endpoint, data, version)
+        if resp.status_code == 401 and self.email:
+            self.relogin()
+            resp = self._raw_req(method, endpoint, data, version)
+
+        if resp.status_code == 401:
+            raise PermissionError()
+
+        if 200 <= resp.status_code <= 299:
+            return resp
+
+        raise Exception(resp.status_code, resp.content)
 
     def get(self, endpoint, version="v1"):
-        resp = self._raw_get(endpoint, version)
-        if resp.status_code == 401 and self.email:
-            self.relogin()
-            resp = self._raw_get(endpoint, version)
-
-        if resp.status_code == 401:
-            raise PermissionError()
-
-        if 200 <= resp.status_code <= 299:
-            return resp
-
-        raise Exception(resp.status_code, resp.content)
-
-    def _raw_post(self, endpoint, data, version):
-        return requests.post(
-            f"{self.url}/api/{version}/{endpoint}",
-            headers=self._headers(),
-            json=data,
-            verify=self.verify,
-        )
+        return self._request_with_relogin("GET", endpoint, version=version)
 
     def post(self, endpoint, data=None, version="v1"):
-        resp = self._raw_post(endpoint, data, version)
-        if resp.status_code == 401 and self.email:
-            self.relogin()
-            resp = self._raw_post(endpoint, data, version)
+        return self._request_with_relogin("POST", endpoint, data=data, version=version)
 
-        if resp.status_code == 401:
-            raise PermissionError()
-
-        if 200 <= resp.status_code <= 299:
-            return resp
-
-        raise Exception(resp.status_code, resp.content)
-    
-    def _raw_put(self, endpoint, data, version):
-        return requests.put(
-            f"{self.url}/api/{version}/{endpoint}",
-            headers=self._headers(),
-            json=data,
-            verify=self.verify,
-        )
-    
     def put(self, endpoint, data=None, version="v1"):
-        resp = self._raw_put(endpoint, data, version)
-        if resp.status_code == 401 and self.email:
-            self.relogin()
-            resp = self._raw_put(endpoint, data, version)
-
-        if resp.status_code == 401:
-            raise PermissionError()
-
-        if 200 <= resp.status_code <= 299:
-            return resp
-
-        raise Exception(resp.status_code, resp.content)
-
-    def _raw_delete(self, endpoint, data, version):
-        return requests.delete(
-            f"{self.url}/api/{version}/{endpoint}",
-            headers=self._headers(),
-            json=data,
-            verify=self.verify,
-        )
+        return self._request_with_relogin("PUT", endpoint, data=data, version=version)
 
     def delete(self, endpoint, data=None, version="v1"):
-        resp = self._raw_delete(endpoint, data, version)
-        if resp.status_code == 401 and self.email:
-            self.relogin()
-            resp = self._raw_post(endpoint, data, version)
+        return self._request_with_relogin("DELETE", endpoint, data=data, version=version)
 
-        if resp.status_code == 401:
-            raise PermissionError()
-
-        if 200 <= resp.status_code <= 299:
-            return resp
-
-        raise Exception(resp.status_code, resp.content)
+    def standard_query_library(self):
+        resp = requests.get(
+            "https://raw.githubusercontent.com/fleetdm/fleet/main/docs/01-Using-Fleet/standard-query-library/standard-query-library.yml"
+        )
+        if resp.status_code == 200:
+            return [
+                yaml.safe_load(s)["spec"]
+                for s in resp.content.decode("utf-8").split("---\n")
+                if s
+            ]
 
     def standard_query_library(self):
         resp = requests.get(
