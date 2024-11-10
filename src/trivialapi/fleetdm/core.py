@@ -33,7 +33,9 @@ class FleetDM:
     def _raw_req(self, method, endpoint, data=None, version="v1"):
         url = f"{self.url}/api/{version}/{endpoint}"
         headers = self._headers()
-        response = requests.request(method, url, headers=headers, json=data, verify=self.verify)
+        response = requests.request(
+            method, url, headers=headers, json=data, verify=self.verify
+        )
         return response
 
     def _request_with_relogin(self, method, endpoint, data=None, version="v1"):
@@ -60,18 +62,9 @@ class FleetDM:
         return self._request_with_relogin("PUT", endpoint, data=data, version=version)
 
     def delete(self, endpoint, data=None, version="v1"):
-        return self._request_with_relogin("DELETE", endpoint, data=data, version=version)
-
-    def standard_query_library(self):
-        resp = requests.get(
-            "https://raw.githubusercontent.com/fleetdm/fleet/main/docs/01-Using-Fleet/standard-query-library/standard-query-library.yml"
+        return self._request_with_relogin(
+            "DELETE", endpoint, data=data, version=version
         )
-        if resp.status_code == 200:
-            return [
-                yaml.safe_load(s)["spec"]
-                for s in resp.content.decode("utf-8").split("---\n")
-                if s
-            ]
 
     def standard_query_library(self):
         resp = requests.get(
@@ -205,8 +198,11 @@ class FleetDM:
 
     def users(self):
         return self.get("fleet/users").json()["users"]
-    
+
     def update_hosts_user(self, host, email):
-        return self.put(f"fleet/hosts/{host['id']}/device_mapping", data={
+        return self.put(
+            f"fleet/hosts/{host['id']}/device_mapping",
+            data={
                 "email": email,
-            },).json()
+            },
+        ).json()
