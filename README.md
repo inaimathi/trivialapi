@@ -1,11 +1,8 @@
 # TrivialAPI
 _(A set of `requests`-based, trivial API bindings for things I use)_
 
-## FleetDM
+## Installation
 
-- Partial implementation of the [FleetDM API](https://fleetdm.com/docs/rest-api/rest-api)
-
-#### Basic usage
 ```
 (env-whatever) $ pip install trivialapi
 Collecting trivialapi
@@ -13,9 +10,51 @@ Collecting trivialapi
 (env-whatever) $ python
 Python 3.10.12 (main, Mar 22 2024, 16:50:05) [GCC 11.4.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
->>> from src.trivialapi.fleetdm import core
+>>>
+```
+
+## Unified
+
+- Partial implementation of the [Unified API](https://docs.unified.to/intro)
+
+```
+>>> from trivialapi.unified import core
+>>> core.Unified("<your unified token goes here>")
+>>> <trivialapi.unified.core.Unified object at 0x7f236ebf6060>
+>>> unified = _
+>>> unified.passthrough("<your github connection ID>", "orgs/mycroft-io/repos") 
+>>> [{'id': 821009702, 'node_id': 'R_kgDOMO-dJg', 'name': 'pycroservice', 'full_name': 'Mycroft-io/pycroservice', 'private': False, 
+...snip...
+'secret_scanning_non_provider_patterns': {'status': 'disabled'}, 'secret_scanning_validity_checks': {'status': 'disabled'}}}]
+>>> repos = _
+>>> repos[0]["has_issues"]
+True
+>>> unified.passthrough("<your github connection ID>", f"repos/{repos[0]['full_name']}/issues")
+[]
+>>> 
+```
+
+In addition to the `passthrough` method, we've currently got support
+
+- `connection`
+- `messaging`
+- `task`
+- `hris`
+- `kms`
+
+name spaces.
+
+### Basic usage
+
+## FleetDM
+
+- Partial implementation of the [FleetDM API](https://fleetdm.com/docs/rest-api/rest-api)
+
+#### Basic usage
+```
+>>> from trivialapi.fleetdm import core
 >>> core.FleetDM("https://your-server.url")
-<src.trivialapi.fleetdm.core.FleetDM object at 0x7afe7e9ffaa0>
+<trivialapi.fleetdm.core.FleetDM object at 0x7afe7e9ffaa0>
 >>> fleet = _
 >>> fleet.login("you@your.email", "your-password")
 True
@@ -41,16 +80,10 @@ True
 #### Basic usage
 
 ```
-(env-whatever) $ pip install trivialapi
-Collecting trivialapi
-...snip...
-(env-whatever) $ python
-Python 3.10.12 (main, Mar 22 2024, 16:50:05) [GCC 11.4.0] on linux
-Type "help", "copyright", "credits" or "license" for more information.
->>> from src.trivialapi.toda import core
-<module 'src.trivialapi.toda.core'>
+>>> from trivialapi.toda import core
+<module 'trivialapi.toda.core'>
 >>> tw = core.Twin.from_file("~/path/to/your/twin.json")
-<src.trivialapi.toda.core.Twin object at 0x74622b7ed150>
+<trivialapi.toda.core.Twin object at 0x74622b7ed150>
 >>> tw.hostname
 '41a9cbc977c39bd3eb5a52a5924f8ef5.micro-staging.biz.todaq.net'
 >>> tw.key
