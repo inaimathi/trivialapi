@@ -92,8 +92,11 @@ def _github_links(resp):
 
 def _github_paginated(raw_req):
     def pgreq(path, params=None):
+        if params is None:
+            params = {}
+        page = 1
         resp = None
-        resp = raw_req(path, params=params)
+        resp = raw_req(path, params={"per_page": 100, **params, "page": page})
         while True:
             if not resp or (not resp.status_code == 200):
                 return
@@ -103,7 +106,8 @@ def _github_paginated(raw_req):
             links = _github_links(resp)
             if not links or "next" not in links:
                 return
-            resp = raw_req(links["next"])
+            page += 1
+            raw_req(path, params={"per_page": 100, **params, "page": page})
 
     return pgreq
 
