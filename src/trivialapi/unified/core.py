@@ -1,4 +1,5 @@
 import logging
+import re
 
 import requests
 
@@ -18,27 +19,31 @@ def getLogger(name, level=logging.DEBUG):
 logger = getLogger("trivialapi::unified", level=logging.DEBUG)
 
 
+def _raw_req(token, path, method=None, params=None):
+    if method is None:
+        method = "GET"
+    if params is not None and not method == "POST":
+        json_body = None
+        param_str = "&".join([f"{k}={v}" for k, v in params.items()])
+        param_str = "?" + param_str
+    else:
+        json_body = params
+        param_str = ""
+    url = f"https://api.unified.to/{path}{param_str}"
+    return requests.request(
+        url=url,
+        method=method,
+        headers={
+            "Accept": "application/json",
+            "Authorization": f"Bearer {token}",
+        },
+        json=json_body,
+    )
+
+
 def _request(token):
     def req(path, method=None, params=None):
-        if method is None:
-            method = "GET"
-        if params is not None and not method == "POST":
-            json_body = None
-            param_str = "&".join([f"{k}={v}" for k, v in params.items()])
-            param_str = "?" + param_str
-        else:
-            json_body = params
-            param_str = ""
-        url = f"https://api.unified.to/{path}{param_str}"
-        resp = requests.request(
-            url=url,
-            method=method,
-            headers={
-                "Accept": "application/json",
-                "Authorization": f"Bearer {token}",
-            },
-            json=json_body,
-        )
+        resp = _raw_req(token, path, method=method, params=params)
         if resp.status_code == 200:
             try:
                 return resp.json()
@@ -48,6 +53,13 @@ def _request(token):
                 return resp.content.decode("utf-8")
         logger.error(f"unified request failed {path}")
         return None
+
+    return req
+
+
+def _request_raw(token):
+    def req(path, method=None, params=None):
+        return _raw_req(token, path, method=method, params=params)
 
     return req
 
@@ -63,6 +75,35 @@ def _paginated(req):
             if not len(page) == paging["limit"]:
                 return
             paging["offset"] += paging["limit"]
+
+    return pgreq
+
+
+def _github_links(resp):
+    link = resp.headers.get("link")
+    if not link:
+        return None
+    link_map = {}
+    for chunk in link.split(","):
+        matched = re.search('<.*?com/(.*?)>.*?rel="(.*?)"', chunk)
+        link_map[matched.group(2)] = matched.group(1)
+    return link_map
+
+
+def _github_paginated(raw_req):
+    def pgreq(path, params=None):
+        resp = None
+        resp = raw_req(path, params=params)
+        while True:
+            if not resp or (not resp.status_code == 200):
+                return
+            res = resp.json()
+            for item in res:
+                yield item
+            links = _github_links(resp)
+            if not links or "next" not in links:
+                return
+            resp = raw_req(links["next"])
 
     return pgreq
 
@@ -152,6 +193,7 @@ class KMS:
     def __init__(self, req, connection_id):
         self.req = req
         self.pgreq = _paginated(req)
+        self.connection_id = connection_id
 
     def spaces(self):
         return self.req(f"kms/{self.connection_id}/space")
@@ -164,6 +206,18 @@ class KMS:
 
     def all_pages(self):
         return self.pgreq(f"kms/{self.connection_id}/page")
+
+
+class Custom:
+    def __init__(self, req, connection_id):
+        self.req = req
+        self.pgithubreq = _github_paginated(req)
+        self.connection_id = connection_id
+
+    def github(self, path, params=None):
+        return self.pgithubreq(
+            f"passthrough/{self.connection_id}/{path}", params=params
+        )
 
 
 class Unified:
@@ -185,6 +239,9 @@ class Unified:
 
     def kms(self, connection_id):
         return KMS(self.req, connection_id)
+
+    def custom(self, connection_id):
+        return Custom(_request_raw(self.token), connection_id)
 
     def passthrough(self, connection_id, path, method="GET", params=None):
         return self.req(f"passthrough/{connection_id}/{path}", method, params)
