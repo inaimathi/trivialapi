@@ -214,7 +214,7 @@ class Custom:
         self.pgithubreq = _github_paginated(req)
         self.connection_id = connection_id
 
-    def github(self, path, params=None):
+    def github_all(self, path, params=None):
         return self.pgithubreq(
             f"passthrough/{self.connection_id}/{path}", params=params
         )
