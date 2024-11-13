@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "trivialapi"
-version = "0.0.27"
+version = "0.0.28"
 authors = [
   { name="inaimathi", email="leo.zovic@gmail.com" },
 ]

@@ -206,3 +206,8 @@ class FleetDM:
                 "email": email,
             },
         ).json()
+      
+    def get_device_mapping_user(self, host):
+        return self.get(
+            f"fleet/hosts/{host['id']}/device_mapping"
+        ).json()
