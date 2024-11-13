@@ -209,4 +209,10 @@ class FleetDM:
     def update_hosts_user(self, host, email):
         return self.put(f"fleet/hosts/{host['id']}/device_mapping", data={
                 "email": email,
-            },).json()
+            },
+        ).json()
+        
+    def get_device_mapping_user(self, host):
+        return self.get(
+            f"fleet/hosts/{host['id']}/device_mapping"
+        ).json()
