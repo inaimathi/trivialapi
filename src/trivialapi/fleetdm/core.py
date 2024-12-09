@@ -12,8 +12,7 @@ class FleetDM:
         self.token = None
 
     def login(self, email, password):
-        resp = self.post(
-            "fleet/login", data={"email": email, "password": password})
+        resp = self.post("fleet/login", data={"email": email, "password": password})
         if resp.status_code == 200:
             self.email = email
             self.password = password
@@ -146,8 +145,7 @@ class FleetDM:
         if secret is None:
             secret = self.enroll_secret()
         return [
-            f"fleetctl package --type={tp} --enable-scripts --fleet-desktop --fleet-url={
-                url} --enroll-secret={secret}"
+            f"fleetctl package --type={tp} --enable-scripts --fleet-desktop --fleet-url={url} --enroll-secret={secret}"
             for tp in ["pkg", "msi", "deb", "rpm"]
         ]
 
@@ -176,8 +174,7 @@ class FleetDM:
                     page.query_selector("#name").fill(email.split("@")[0])
                     page.query_selector("#email").fill(email)
                     page.query_selector("#password").fill(password)
-                    page.query_selector(
-                        "#password_confirmation").fill(password)
+                    page.query_selector("#password_confirmation").fill(password)
                     page.query_selector('button[type="submit"]').click()
 
                     print("Filling out org...")
