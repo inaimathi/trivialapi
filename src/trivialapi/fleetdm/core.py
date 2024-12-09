@@ -215,11 +215,11 @@ class FleetDM:
             f"fleet/hosts/{host['id']}/device_mapping"
         ).json()
 
-    def lock_computer(self, host):
+    def lock_computer(self, host, view_pin):
         return self.post(
             f"fleet/hosts/{host['id']}/lock",
             data={
-                # view_pin: boolean
+                "view_pin": view_pin
             }
         ).json()
 
