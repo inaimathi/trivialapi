@@ -206,8 +206,21 @@ class FleetDM:
                 "email": email,
             },
         ).json()
-      
+
     def get_device_mapping_user(self, host):
         return self.get(
             f"fleet/hosts/{host['id']}/device_mapping"
+        ).json()
+
+    def lock_computer(self, host, view_pin):
+        return self.post(
+            f"fleet/hosts/{host['id']}/lock",
+            data={
+                "view_pin": view_pin
+            }
+        ).json()
+
+    def unlock_computer(self, host):
+        return self.post(
+            f"fleet/hosts/{host['id']}/unlock",
         ).json()
