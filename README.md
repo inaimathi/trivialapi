@@ -82,16 +82,19 @@ True
 ```
 >>> from trivialapi.toda import core
 <module 'trivialapi.toda.core'>
->>> tw = core.Twin.from_file("~/path/to/your/twin.json")
-<trivialapi.toda.core.Twin object at 0x74622b7ed150>
->>> tw.hostname
+>>> twina = core.Twin.from_file("~/path/to/your/twin.json")
+>>> twina.hostname
 '41a9cbc977c39bd3eb5a52a5924f8ef5.micro-staging.biz.todaq.net'
->>> tw.key
+>>> twina.key
 'redacted'
->>> tw.mint(1000, minting_info="Precision 0 minting test")
+>>> twina.mint(1000, minting_info="Precision 0 minting test")
 {'result': 'success', 'files': ['419bfe67b7fafe0842813f13044d637775349d2b4df347639eccc6ec82093a8ecb'], 'root': '41a2099e84dd4690ea55774506d58ee6cf6ac9fe0c9806239ef6e251a6bc597641'}
->>> tw.balance()
+>>> minted = _
+>>> twina.balance()
 [{'balance': 1000, 'quantity': 1000, 'files': ['419bfe67b7fafe0842813f13044d637775349d2b4df347639eccc6ec82093a8ecb'], 'fileValue': {'419bfe67b7fafe0842813f13044d637775349d2b4df347639eccc6ec82093a8ecb': 1000}, 'poptop': '419ccac82bcf1216a70929664cdeaa97bcc01deb87d190a0c7ce90e62d7b89a6bf', 'displayPrecision': 0, 'type': '41a2099e84dd4690ea55774506d58ee6cf6ac9fe0c9806239ef6e251a6bc597641'}]
+>>> twinb = core.Twin.from_file("~/path/to/your/other/twin.json")
+>>> twina.transfer(minted["root"], 50, f"https://{twinb.hostname}")
+{'result': 'Success', 'files': ['41a2099e84dd4690ea55774506d58ee6cf6ac9fe0c9806239ef6e251a6bc597641'], 'newBalance': 950}
 ```
 
 
