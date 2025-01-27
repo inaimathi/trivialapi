@@ -1,1 +1,1 @@
-python3 -m unittest tests.test_basics
+python3 -m unittest discover -v -s tests -p "test_*.py"
