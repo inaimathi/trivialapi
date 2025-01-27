@@ -231,6 +231,18 @@ class Repo:
         self.connection_id = connection_id
         self.org_id = org_id
 
+    def all_organizations(self, include_raw=False):
+        params = {}
+        if include_raw:
+            params["fields"] = "raw"
+        return self.pgreq(f"repo/{self.connection_id}/organization", params=params)
+
+    def organization(self, org_id, include_raw=False):
+        params = {}
+        if include_raw:
+            params["fields"] = "raw"
+        return self.pgreq(f"repo/{self.connection_id}/organization", params=params)
+
     def all_repositories(self, include_raw=False):
         params = {"org_id": self.org_id}
         if include_raw:
