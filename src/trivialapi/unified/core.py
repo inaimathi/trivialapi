@@ -224,6 +224,66 @@ class Custom:
         )
 
 
+class Repo:
+    def __init__(self, req, connection_id, org_id):
+        self.req = req
+        self.pgreq = _paginated(req)
+        self.connection_id = connection_id
+        self.org_id = org_id
+
+    def all_repositories(self, include_raw=False):
+        params = {"org_id": self.org_id}
+        if include_raw:
+            params["fields"] = "raw"
+        return self.pgreq(f"repo/{self.connection_id}/repository", params=params)
+
+    def repository(self, repository_id, include_raw=False):
+        params = {}
+        if include_raw:
+            params["fields"] = "raw"
+        return self.req(
+            f"repo/{self.connection_id}/repository/{repository_id}", params=params
+        )
+
+    def all_branches(self, repository_id, include_raw=False):
+        params = {"repo_id": repository_id}
+        if include_raw:
+            params["fields"] = "raw"
+        return self.pgreq(f"repo/{self.connection_id}/branch", params=params)
+
+    def branch(self, branch_id, include_raw=False):
+        params = {}
+        if include_raw:
+            params["fields"] = "raw"
+        return self.req(f"repo/{self.connection_id}/branch/{branch_id}", params=params)
+
+    def all_commits(self, repository_id, branch_id, include_raw=False):
+        params = {"repo_id": repository_id, "branch_id": branch_id}
+        if include_raw:
+            params["fields"] = "raw"
+        return self.pgreq(f"repo/{self.connection_id}/commit", params=params)
+
+    def commit(self, commit_id, include_raw=False):
+        params = {}
+        if include_raw:
+            params["fields"] = "raw"
+        return self.req(f"repo/{self.connection_id}/commit/{commit_id}", params=params)
+
+    def all_pull_requests(self, repository_id, include_raw=False):
+        params = {"repo_id": repository_id}
+        if include_raw:
+            params["fields"] = "raw"
+        return self.pgreq(f"repo/{self.connection_id}/pullrequest", params=params)
+
+    def pull_request(self, pull_request_id, include_raw=False):
+        params = {}
+        if include_raw:
+            params["fields"] = "raw"
+        return self.req(
+            f"repo/{self.connection_id}/pullrequest/{pull_request_id}", params=params
+        )
+
+
 class Unified:
     def __init__(self, token):
         self.token = token
@@ -243,6 +303,9 @@ class Unified:
 
     def kms(self, connection_id):
         return KMS(self.req, connection_id)
+
+    def repo(self, connection_id, org_id):
+        return Repo(self.req, connection_id, org_id)
 
     def custom(self, connection_id):
         return Custom(_request_raw(self.token), connection_id)
