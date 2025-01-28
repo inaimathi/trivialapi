@@ -269,8 +269,10 @@ class Repo:
             params["fields"] = "raw"
         return self.req(f"repo/{self.connection_id}/branch/{branch_id}", params=params)
 
-    def all_commits(self, repository_id, branch_id, include_raw=False):
-        params = {"repo_id": repository_id, "branch_id": branch_id}
+    def all_commits(self, repository_id, branch_id=None, include_raw=False):
+        params = {"repo_id": repository_id}
+        if branch_id is not None:
+            params["branch_id"] = branch_id
         if include_raw:
             params["fields"] = "raw"
         return self.pgreq(f"repo/{self.connection_id}/commit", params=params)
