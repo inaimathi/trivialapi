@@ -16,6 +16,14 @@ class TODA:
         self.token = token.get(self.client_id, self.client_secret)[0]["access_token"]
 
     @classmethod
+    def fresh(cls):
+        dct, error = util.apiPost("v2/account", None)
+        if error is None:
+            with open(f"toda-account-{dct['id']}.json", "w") as f:
+                f.write(json.dumps(dct))
+            return cls.from_dict(dct)
+
+    @classmethod
     def from_dict(cls, dct):
         res = cls(**dct)
         return res
