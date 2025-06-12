@@ -52,6 +52,7 @@ class TODA:
             return Twin.from_dict(res)
 
     def validPayment(self, payment_dict):
+        self.bump()
         return payment.valid(
             self.token,
             payment_dict["hash"],
@@ -97,6 +98,7 @@ class Twin:
             metadata = ""
         if dq is None:
             dq = util.PROD_DQ
+        toda.bump()
         return commodity.create(toda.token, self.id, value, metadata, dq)
 
     def transfer(self, root, amount, destination_hostname):
