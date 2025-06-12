@@ -25,10 +25,17 @@ class TODA:
             return None
 
     @classmethod
-    def fresh(cls):
+    def fresh(cls, dir=None, prefix=None, suffix=None):
         dct, error = util.apiPost("v2/account", None)
         if error is None:
-            with open(f"toda-account-{dct['id']}.json", "w") as f:
+            if dir is None:
+                dir = "."
+            if prefix is None:
+                prefix = "toda-account-"
+            if suffix is None:
+                suffix = ".json"
+            fname = os.path.join(dir, f"{prefix}{dct['id']}{suffix}")
+            with open(fname, "w") as f:
                 f.write(json.dumps(dct))
             return cls.from_dict(dct)
 
@@ -42,23 +49,34 @@ class TODA:
         with open(os.path.expanduser(path), "r") as f:
             return cls.from_dict(json.loads(f.read()))
 
-    def createTwin(self, dq=None):
+    def createTwin(self, dq=None, dir=None, prefix=None, suffix=None):
         if dq is None:
             dq = util.PROD_DQ
-        res = twin.create(self.token, dq)[0]
+            res = twin.create(self.token, dq)[0]
         if res is not None:
-            with open(f"twin-{res['id']}.json", "w") as f:
+            if dir is None:
+                dir = "."
+            if prefix is None:
+                prefix = "twin-"
+            if suffix is None:
+                suffix = ".json"
+            fname = os.path.join(dir, f"{prefix}{res['id']}{suffix}")
+            with open(fname, "w") as f:
                 f.write(json.dumps(res))
             return Twin.from_dict(res)
 
-    def validPayment(self, payment_dict):
+    def validatePayment(self, payment_dict):
         self.bump()
-        return payment.valid(
+        res = payment.valid(
             self.token,
             payment_dict["hash"],
             payment_dict["nonce"],
             payment_dict["timestamp"],
         )
+        if res[0] is not None:
+            return True
+
+        return False
 
     # def getTwin(self):
     #     pass
@@ -93,13 +111,27 @@ class Twin:
             },
         )[0]
 
-    def createCommodity(self, toda, value, metadata=None, dq=None):
+    def createCommodity(
+        self, toda, value, metadata=None, dq=None, dir=None, prefix=None, suffix=None
+    ):
         if metadata is None:
             metadata = ""
         if dq is None:
             dq = util.PROD_DQ
+        if dir is None:
+            dir = "."
+        if prefix is None:
+            prefix = f"twin-{self.id}-commodity-"
+        if suffix is None:
+            suffix = ".json"
+
         toda.bump()
-        return commodity.create(toda.token, self.id, value, metadata, dq)
+        res, error = commodity.create(toda.token, self.id, value, metadata, dq)
+        if error is None:
+            fname = os.path.join(dir, f"{prefix}{res['hash']}{suffix}")
+            with open(fname, "w") as f:
+                f.write(json.dumps(res[0]))
+            return res
 
     def transfer(self, root, amount, destination_hostname):
         return util.apiPost(
