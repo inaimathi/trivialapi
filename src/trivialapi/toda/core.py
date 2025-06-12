@@ -1,7 +1,7 @@
 import json
 import os
 
-from . import commodity, token, twin, util
+from . import commodity, payment, token, twin, util
 
 
 class TODA:
@@ -51,8 +51,16 @@ class TODA:
                 f.write(json.dumps(res))
             return Twin.from_dict(res)
 
-    def getTwin(self):
-        pass
+    def validPayment(self, payment_dict):
+        return payment.valid(
+            self.token,
+            payment_dict["hash"],
+            payment_dict["nonce"],
+            payment_dict["timestamp"],
+        )
+
+    # def getTwin(self):
+    #     pass
 
 
 class Twin:
