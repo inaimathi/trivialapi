@@ -3,15 +3,8 @@ from os import environ as ENV
 import requests
 
 STAGING_DQ = "410ddbac7c8a259da8dfcc5f55bcb28b77d29be9c540a2c23444b416d584801c30"
-ENVIRONMENT = ENV.get("TODA_ENVIRONMENT", "stage").lower()
-BASE_URL = ENV.get(
-    "API_BASE_URL",
-    (
-        "https://pay.stage.m.todaq.net"
-        if ENVIRONMENT == "stage"
-        else "https://pay.m.todaq.net"
-    ),
-).rstrip("/")
+PROD_DQ = "412964f209c966234250eba05d1a118da128925084df9f5459eb9243157e452e73"
+BASE_URL = ENV.get("API_BASE_URL", "https://pay.m.todaq.net").rstrip("/")
 
 
 def url(path, base=None):

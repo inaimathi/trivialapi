@@ -1,7 +1,7 @@
 import json
 import os
 
-from . import token, twin, util
+from . import commodity, token, twin, util
 
 
 class TODA:
@@ -13,7 +13,16 @@ class TODA:
         client = [s for s in secrets if "client_id" in s and "client_secret" in s][0]
         self.client_id = client["client_id"]
         self.client_secret = client["client_secret"]
+        self.bump()
+
+    def bump(self):
         self.token = token.get(self.client_id, self.client_secret)[0]["access_token"]
+
+    def publicSecret(self):
+        try:
+            return [s for s in self.secrets if "public_secret" in s][0]["public_secret"]
+        except IndexError:
+            return None
 
     @classmethod
     def fresh(cls):
@@ -35,7 +44,7 @@ class TODA:
 
     def createTwin(self, dq=None):
         if dq is None:
-            dq = util.STAGING_DQ
+            dq = util.PROD_DQ
         res = twin.create(self.token, dq)[0]
         if res is not None:
             with open(f"twin-{res['id']}.json", "w") as f:
@@ -75,12 +84,26 @@ class Twin:
             },
         )[0]
 
+    def createCommodity(self, toda, value, metadata=None, dq=None):
+        if metadata is None:
+            metadata = ""
+        if dq is None:
+            dq = util.PROD_DQ
+        return commodity.create(toda.token, self.id, value, metadata, dq)
+
     def transfer(self, root, amount, destination_hostname):
         return util.apiPost(
             f"https://{self.hostname}/dq/{root}/transfer?apiKey={self.key}",
             None,
             {"amount": amount, "destination": destination_hostname},
         )[0]
+
+    def transfer_file(self, filehash, destination_hostname, metadata=None):
+        dat = {"destination": destination_hostname}
+        if metadata is not None:
+            dat["metadata"] = metadata
+        url = f"https://{self.hostname}/files/{filehash}/transfer?apiKey={self.key}"
+        return util.apiPost(url, None, dat)
 
     def balance(self):
         return util.apiGet(f"https://{self.hostname}/dq?apiKey={self.key}", None)[0]
