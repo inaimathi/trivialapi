@@ -133,6 +133,15 @@ class Twin:
                 f.write(json.dumps(res[0]))
             return res
 
+    def inventory(self, filehash=None):
+        if filehash is None:
+            return util.apiGet(
+                f"https://{self.hostname}/inventory?apiKey={self.key}", None
+            )[0]
+        return util.apiGet(
+            f"https://{self.hostname}/inventory/{filehash}?apiKey={self.key}", None
+        )[0]
+
     def transfer(self, root, amount, destination_hostname, metadata=None):
         dat = {"amount": amount, "destination": destination_hostname}
         if metadata is not None:
