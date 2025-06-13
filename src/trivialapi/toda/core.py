@@ -133,11 +133,12 @@ class Twin:
                 f.write(json.dumps(res[0]))
             return res
 
-    def transfer(self, root, amount, destination_hostname):
+    def transfer(self, root, amount, destination_hostname, metadata=None):
+        dat = {"amount": amount, "destination": destination_hostname}
+        if metadata is not None:
+            dat["metadata"] = metadata
         return util.apiPost(
-            f"https://{self.hostname}/dq/{root}/transfer?apiKey={self.key}",
-            None,
-            {"amount": amount, "destination": destination_hostname},
+            f"https://{self.hostname}/dq/{root}/transfer?apiKey={self.key}", None, dat
         )[0]
 
     def transfer_file(self, filehash, destination_hostname, metadata=None):
